@@ -3,8 +3,8 @@ import pandas as pd
 from selenium import webdriver
 import time
 
-#authorization
-gc = pygsheets.authorize(service_file='LinkedIn Scraper\key.json')
+# authorization
+gc = pygsheets.authorize(service_file='key.json')
 
 # Create empty dataframe
 df = pd.DataFrame()
@@ -14,13 +14,14 @@ df['Company'] = []
 df['Name'] = []
 df['Link'] = []
 
-#open the google spreadsheet (where 'PY to Gsheet Test' is the name of my sheet)
-sheet = gc.open_by_url('https://docs.google.com/spreadsheets/d/1AqJie8U_w7Gd3TBUyqYmR23RZ-eHBylwZRrhhh5cFDg/edit#gid=0')
+# open the google spreadsheet (where 'PY to Gsheet Test' is the name of my sheet)
+sheet = gc.open_by_url(
+    'https://docs.google.com/spreadsheets/d/1AqJie8U_w7Gd3TBUyqYmR23RZ-eHBylwZRrhhh5cFDg/edit#gid=0')
 
-#select the first sheet 
+# select the first sheet
 # scrapedSheet = sheet[4]
 
-#update the first sheet with df, starting at cell B2.
+# update the first sheet with df, starting at cell B2.
 # scrapedSheet.set_dataframe(df,(1,1))
 
 
@@ -29,8 +30,8 @@ def get_all_outreach():
     names = []
     links = []
 
-    for person in range(6,13):
-        for line in range(2,5):
+    for person in range(6, 13):
+        for line in range(2, 5):
             print(sheet[person].cell(f"A{line}").value)
             if ((sheet[person].cell(f"A{line}").value != '') and (sheet[person].cell(f"B{line}").value != '') and (sheet[person].cell(f"C{line}").value != '')):
                 companies.append(sheet[person].cell(f"A{line}").value)
@@ -40,25 +41,37 @@ def get_all_outreach():
     print(companies)
     print(names)
     print(links)
-    
+
     df['Company'] = companies
     df['Name'] = names
     df['Link'] = links
 
+
 def write_total_outreach():
     total_sheet = sheet[5]
-    total_sheet.set_dataframe(df,(1,1))
+    total_sheet.set_dataframe(df, (1, 1))
 
-def scrape_recruiters(names,links):
+
+def scrape_recruiters(names, links):
     options = webdriver.ChromeOptions()
     options.add_argument("--incognito")
     # options.add_argument("--headless")
     browser = webdriver.Chrome("chromedriver.exe", options=options)
     browser.set_window_size(1920, 1080)
     browser.maximize_window()
-    browser.get("https://www.linkedin.com")
-    time.sleep(5)
+    browser.get("https://www.linkedin.com/in/calvin-zheng-a44554275/")
+    time.sleep(2)
+    browser.find_element("xpath",'//*[@id="public_profile_contextual-sign-in"]/div/section/main/div/div/div[1]/button').click()
 
+    browser.find_element("id", 'public_profile_contextual-sign-in_sign-in-modal_session_key').send_keys('clvnzheng@gmail.com')
+    
+    browser.find_element("id", 'public_profile_contextual-sign-in_sign-in-modal_session_password').send_keys('QHacksPassword')
+
+    browser.find_element("xpath",'//*[@id="public_profile_contextual-sign-in_sign-in-modal"]/div/section/main/div/form/div[2]/button').click()
+
+    time.sleep(2)
+    # clvnzheng@gmail.com
+    # QHacksPassword
     # https://www.linkedin.com/in/calvin-zheng-a44554275/
 
     # login to linkedin
@@ -67,8 +80,9 @@ def scrape_recruiters(names,links):
     # add to lists
     # return
     # write to sheet
-    # 
+    #
 
 
-get_all_outreach()
-write_total_outreach()
+# get_all_outreach()
+# write_total_outreach()
+scrape_recruiters([], [])
